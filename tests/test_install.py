@@ -152,6 +152,30 @@ class InstallTests(unittest.TestCase):
         self.assertEqual(self.agents.read_bytes(), original)
         self.assertEqual(self.apply(), 'installed')
 
+    def plugin_report(self, plugins):
+        from types import SimpleNamespace
+        fake = SimpleNamespace(returncode=0, stdout=json.dumps({'installed': plugins}))
+        with patch.object(h.subprocess, 'run', return_value=fake):
+            return h.plugin_status(self.home)
+
+    def test_existing_curated_plugin_needs_no_dev_marketplace(self):
+        curated = {'name': 'superpowers', 'pluginId': 'superpowers@openai-curated-remote',
+                   'version': '6.4.1', 'enabled': True}
+        self.assertEqual(self.plugin_report([curated])['issues'], [])
+        disabled = dict(curated, pluginId='superpowers@superpowers-dev', enabled=False)
+        self.assertEqual(self.plugin_report([curated, disabled])['issues'], [])
+
+    def test_two_active_sources_are_reported(self):
+        curated = {'name': 'superpowers', 'pluginId': 'superpowers@openai-curated-remote',
+                   'version': '6.4.1', 'enabled': True}
+        dev = dict(curated, pluginId='superpowers@superpowers-dev')
+        self.assertTrue(self.plugin_report([curated, dev])['issues'])
+
+    def test_wrong_curated_version_is_reported(self):
+        self.assertTrue(self.plugin_report([
+            {'name': 'superpowers', 'pluginId': 'superpowers@openai-curated-remote',
+             'version': '0.0.0', 'enabled': True}])['issues'])
+
     def test_wrong_plugin_identity_is_not_aligned(self):
         from types import SimpleNamespace
         fake = SimpleNamespace(returncode=0, stdout=json.dumps({'installed': [

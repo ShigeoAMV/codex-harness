@@ -223,6 +223,7 @@ def plugin_status(home):
     manifest = json.loads((ROOT / 'harness.json').read_text(encoding='utf-8'))
     expected = manifest['superpowers']['version']
     result = {'expected_superpowers': expected, 'issues': [], 'superpowers': []}
+    active = []
     try:
         env = dict(os.environ, CODEX_HOME=str(home))
         run = subprocess.run(['codex', 'plugin', 'list', '--json'], capture_output=True,
@@ -233,8 +234,9 @@ def plugin_status(home):
         active = [p for p in plugins if p['name'] == 'superpowers' and p.get('enabled')]
         result['superpowers'] = [{k: p.get(k) for k in ('pluginId', 'version')} for p in active]
         if (len(active) != 1 or active[0].get('version') != expected
-                or active[0].get('pluginId') != manifest['superpowers']['plugin']):
-            result['issues'].append('Expected exactly one enabled ' + manifest['superpowers']['plugin'] + ' ' + expected)
+                or active[0].get('pluginId') not in manifest['superpowers']['accepted_plugins']):
+            result['issues'].append('Expected exactly one enabled Superpowers ' + expected
+                                    + ' from an accepted source; reuse a matching existing installation')
     except (OSError, subprocess.TimeoutExpired, ValueError, KeyError, HarnessError):
         result['issues'].append('Cannot verify Superpowers; check Codex plugin settings manually')
     config = read(home / 'config.toml')
@@ -246,7 +248,8 @@ def plugin_status(home):
             result['qodo'] = 'present; not required or invoked by this harness'
     marketplace = parsed.get('marketplaces', {}).get('superpowers-dev', {})
     upstream = manifest['superpowers']['repository']
-    if (marketplace.get('ref') != manifest['superpowers']['commit']
+    uses_dev = any(p.get('pluginId') == manifest['superpowers']['plugin'] for p in active)
+    if uses_dev and (marketplace.get('ref') != manifest['superpowers']['commit']
             or marketplace.get('source_type') != 'git'
             or marketplace.get('source') not in (upstream, upstream + '.git')):
         result['issues'].append('Superpowers marketplace source/ref differs from harness.json pin')

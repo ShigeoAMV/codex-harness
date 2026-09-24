@@ -15,7 +15,7 @@ Priorisierung und Umsetzung mit dir.
 ```sh
 git clone https://github.com/ShigeoAMV/codex-harness.git
 cd codex-harness
-git checkout v0.1.5
+git checkout v0.1.6
 ```
 
 Linux:
@@ -36,11 +36,21 @@ Bei Bedarf `HARNESS_PYTHON` auf den Python-Pfad setzen. `CODEX_HOME` wird beacht
 alternativ `--codex-home PATH` verwenden. Jede Codex-Instanz braucht die Installation
 in ihrem eigenen Benutzer-/Codex-Verzeichnis. Danach eine neue Codex-Aufgabe starten.
 
-### Superpowers einmalig angleichen
+### Superpowers: vorhandene Installation behalten
 
-Keine Skill-Kopie: den offiziellen Marketplace auf den geprueften Commit pinnen.
-Vorher eine lokale Sicherung der Codex-`config.toml` anlegen. Die folgenden nativen
-Codex-Befehle verwalten Marketplace und Plugin; `harness rollback` macht sie nicht rueckgaengig.
+Zuerst die vorhandenen Plugins inventarisieren. **Eine aktive Superpowers-Version
+6.4.1 aus `openai-curated-remote` oder `superpowers-dev` reicht.** Eine passende
+Installation weiterverwenden; kein Quellenwechsel und keine zweite Installation
+nur fuer den Harness. Eine bereits deaktivierte zweite Kopie darf deaktiviert bleiben.
+
+Desktop und CLI koennen unterschiedliche Plugin-Kataloge zeigen. Ein fehlender
+CLI-Eintrag beweist deshalb nicht, dass Superpowers in der App fehlt. Bei unklarer
+Inventur die Einschraenkung melden und zuerst die tatsaechlich verwendete Umgebung
+pruefen. Nicht vorsorglich ein weiteres Plugin installieren. Abweichende Versionen
+sichtbar machen und gezielt klaeren; sie verlangen keinen Marketplace-Wechsel.
+
+**Nur wenn Superpowers tatsaechlich fehlt:** lokale Codex-`config.toml` sichern und
+den offiziellen Marketplace auf den geprueften Commit pinnen:
 
 ```sh
 codex plugin marketplace add obra/superpowers --ref 5bf4e78011075bcfc0dc295f0724994cd123ee71
@@ -48,17 +58,10 @@ codex plugin add superpowers@superpowers-dev
 codex plugin list --json
 ```
 
-Falls `superpowers-dev` bereits mit einem anderen Stand registriert ist, nach der
-Konfigurationssicherung zuerst `codex plugin marketplace remove superpowers-dev`
-ausfuehren und direkt mit den beiden Installationsbefehlen oben neu registrieren.
-Das entfernt die Marketplace-Registrierung, nicht andere Plugins. Schlaegt die neue
-Registrierung fehl, die gesicherte Konfiguration wiederherstellen.
-
-Genau eine Superpowers-Installation in Version 6.4.1 aktiv lassen. Eine weitere
-Installation in den Codex-Plugin-Einstellungen deaktivieren, nicht ihre Dateien
-loeschen. Desktop und CLI koennen unterschiedliche Plugin-Kataloge zeigen; deshalb
-nach dem Neustart auch im Desktop pruefen. Andere Plugins bleiben erhalten. Qodo ist
-keine Abhaengigkeit und wird vom Harness nicht aufgerufen.
+Diese nativen Plugin-Befehle werden durch `harness rollback` nicht rueckgaengig
+gemacht. Bestehende Marketplace-Registrierungen nicht blind ersetzen. Sind wirklich
+zwei Kopien aktiv, eine passende behalten und die andere deaktivieren. Andere Plugins
+bleiben erhalten. Qodo ist keine Abhaengigkeit und wird vom Harness nicht aufgerufen.
 
 ## Updates und Rollback
 
@@ -83,8 +86,10 @@ Lokale Aenderungen im verwalteten Teil blockieren Update/Rollback. Eigene Regeln
 ausserhalb des Blocks pflegen. `AGENTS.override.md` wird als Vorrangkonflikt gemeldet.
 Projekt-/Firmenregeln und MCP-Konfigurationen werden weder ersetzt noch synchronisiert.
 Semantische Widersprueche brauchen einen Review; `status` erkennt Dateidrift, keine Bedeutung.
-`status` prueft ausserdem die erwartete Plugin-ID, Version und Marketplace-Quelle
-mit Commit-Pin. Es ist eine Inventur, kein Integritaetsnachweis jedes Plugin-Cachefiles.
+`status` prueft ausserdem genau eine aktive Superpowers-Installation aus den
+akzeptierten Quellen in der erwarteten Version. Nur fuer eine aktive
+`superpowers-dev`-Installation wird zusaetzlich deren Marketplace-Commit-Pin geprueft.
+Die kuratierte Installation braucht keine zusaetzliche Marketplace-Registrierung. Es ist eine Inventur, kein Integritaetsnachweis jedes Plugin-Cachefiles.
 
 Lokale Sicherungen und Zustand: `CODEX_HOME/harness/`. Bei einem unterbrochenen Lauf
 erst `status`, Sicherungen und laufende Prozesse pruefen. Eine verwaiste `install.lock`
@@ -162,7 +167,7 @@ absichtliche Fehler, fehlende Befehle und Timeouts. Keine Kundensoftware wird ve
 ## Fuer die Debian-Codex-Aufgabe
 
 > Lies START-HERE.md aus https://github.com/ShigeoAMV/codex-harness auf Version
-> v0.1.5 und fuehre das Onboarding mit mir fuer meinen Webdienst durch.
+> v0.1.6 und fuehre das Onboarding mit mir fuer meinen Webdienst durch.
 
 Referenzen: [Codex AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md),
 [Superpowers, gepinnter Stand](https://github.com/obra/superpowers/tree/5bf4e78011075bcfc0dc295f0724994cd123ee71).

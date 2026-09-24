@@ -1,10 +1,11 @@
 {
   "schema": 1,
-  "version": "0.1.5",
+  "version": "0.1.6",
   "superpowers": {
     "repository": "https://github.com/obra/superpowers",
     "version": "6.4.1",
     "commit": "5bf4e78011075bcfc0dc295f0724994cd123ee71",
-    "plugin": "superpowers@superpowers-dev"
+    "plugin": "superpowers@superpowers-dev",
+    "accepted_plugins": ["superpowers@openai-curated-remote", "superpowers@superpowers-dev"]
   }
 }

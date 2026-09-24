@@ -8,7 +8,7 @@ documentation tree or run every scanner after every edit.
 
 | Purpose | Standard | Required decision at project onboarding |
 | --- | --- | --- |
-| Engineering | Superpowers | Use the harness-pinned version |
+| Engineering | Superpowers | Reuse one existing supported installation; see README for accepted sources/version. Never add a second copy merely to change marketplace. |
 | Separate PR review | Greptile preferred; fresh Codex review as fallback | Configure Greptile for the selected repository when code transmission is allowed and a no-extra-cost plan is available; otherwise record the reason and fallback |
 | Secrets | Gitleaks | Integrate changed-content checks and relevant Git history scanning before release |
 | Source security | OpenGrep | Pin engine and suitable rules for the project's supported languages |
