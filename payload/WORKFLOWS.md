@@ -40,6 +40,16 @@ services or broaden code access to remove a gap.
    missing, fallback, or not applicable with a reason in existing project documentation.
    A successful onboarding report must not imply missing items have been installed.
 
+For large or weakly tested existing applications, map coherent areas and their
+dependencies across the relevant codebase, not only recent diffs. Confirm intended
+behavior rather than treating existing bugs as requirements. Prioritize authorization,
+data loss and exposed interfaces. For each finding: reproduce/test, make a focused
+repair, run regression checks and obtain a separate review. Document a manual
+reproduction and coverage gap if automation is impractical. Avoid blanket rewrites.
+Track each area's reviewed commit, scope, evidence and remaining findings in existing
+project documentation. Completion means the agreed criteria, regression checks and
+review are satisfied, with exceptions visible; a clean scan alone is not a full audit.
+
 ## Risk and verification
 
 Dev: relevant build/type/lint/tests plus a quick secret check for changed content.

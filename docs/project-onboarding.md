@@ -10,6 +10,37 @@ Tools und Dokumentation weiterverwenden. Keine grossflaechige Neuentwicklung.
 - Kritische Nutzerablaeufe, Berechtigungs-/Tenant-Grenzen und sensible Daten kurz
   festhalten. Intern/public und moeglichen Schadensumfang bestimmen.
 
+### Bestehende Anwendung stabilisieren
+
+Bei grossen oder wenig abgesicherten Altbestaenden diesen Ablauf mit dem Nutzer
+priorisieren und mit den folgenden Test-/Scanner-Schritten verbinden:
+
+1. **Bereiche und Verbindungen erfassen:** die Anwendung in zusammenhaengende
+   Bereiche gliedern, etwa Auth, Datenzugriff und zentrale Geschaeftsablaeufe. Wichtige
+   Abhaengigkeiten, Datenfluesse und gemeinsame Helfer mit aufnehmen. Den gesamten
+   relevanten Altbestand erfassen, nicht nur kuerzlich geaenderte Dateien.
+2. **Sollverhalten klaeren:** Anforderungen aus vorhandener Dokumentation und
+   Nutzerabsicht ableiten. Offene kritische Fragen mit dem Nutzer klaeren. Bestehendes
+   Verhalten liefert Hinweise, ist aber kein Beweis fuer Korrektheit; bekannte Fehler
+   nicht durch Tests als Sollzustand festschreiben.
+3. **Nach Risiko pruefen:** zuerst Berechtigungen/Tenant-Grenzen, Secrets, Datenverlust,
+   Transaktionen und oeffentliche Schnittstellen; danach wichtige Funktionsfehler und
+   Wartbarkeit. Scanner breit einsetzen, Code-Reviews bereichsweise vertiefen und das
+   Zusammenspiel der Bereiche pruefen. Ein PR-Review neuer Aenderungen ersetzt keinen
+   Review des vorhandenen Bereichs einschliesslich seiner Abhaengigkeiten.
+4. **Gezielt reparieren:** je Befund Reproduktion und aussagekraeftigen Test erstellen,
+   eine kleine Reparatur umsetzen und separat reviewen lassen. Wo ein automatisierter
+   Test nicht praktikabel ist, die reproduzierbare Pruefung und verbleibende Luecke
+   dokumentieren. Funktionierendes Verhalten schuetzen; Refactoring nur fuer konkrete
+   Probleme, kein pauschaler Rewrite und keine rein kosmetische Sanierung.
+5. **Pruefstand sichtbar halten:** in der bestehenden Statustabelle je Bereich
+   Prioritaet, Stand (offen/in Pruefung/geprueft mit Restbefunden/abgeschlossen),
+   geprueften Commit, Umfang, Nachweise und offene Punkte festhalten. Abgeschlossen
+   heisst: vereinbarte Kriterien erfuellt, Regression geprueft und Review erledigt;
+   Ausnahmen bleiben sichtbar. Bei relevanten Aenderungen die betroffenen Nachweise
+   aktualisieren. Ein gruener Scannerlauf bedeutet nicht, dass der Bereich umfassend
+   geprueft oder die Anwendung fehlerfrei ist.
+
 ## 2. Tests und Scanner anbinden
 
 - Die wichtigsten bisher ungeschuetzten Ablaeufe und negativen Berechtigungsfaelle
