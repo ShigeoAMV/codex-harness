@@ -11,7 +11,7 @@ Der Harness aendert keine Full-Access-, Modell-, Account- oder Sandbox-Einstellu
 ```sh
 git clone https://github.com/ShigeoAMV/codex-harness.git
 cd codex-harness
-git checkout v0.1.0
+git checkout v0.1.1
 ```
 
 Linux:
@@ -90,6 +90,17 @@ bereit. Sie bleiben lokal und werden nicht in dieses Repository hochgeladen.
 
 ## Ein bestehendes Projekt anbinden
 
+Der Standard ist **Superpowers + Greptile mit Codex-Review als Ersatz + Gitleaks,
+OpenGrep und Trivy**. Greptile wird bei der Projektanbindung eingerichtet oder der
+Verzicht begruendet. Kritische Aenderungen brauchen einen separaten Review; ein
+bestimmter Anbieter ist dafuer nicht zwingend. ZAP/Schemathesis kommen bei passenden
+Web-/API-Projekten dazu, Shannon/Strix erst spaeter.
+
+Die kurze [Anleitung zur Projektanbindung](docs/project-onboarding.md) beschreibt
+Einrichtung, Ersatzloesungen und Abnahme. Die Installation dieses Harness allein
+verbindet weder Greptile noch installiert sie Scanner. Der jeweilige Projekt-Codex
+setzt diese Schritte fuer die konkrete Anwendung um und weist offene Punkte aus.
+
 Im Projekt dessen Anweisungen und Stack lesen, aktuelle Tests ausfuehren, kritische
 Flows und Grenzen erfassen. Die Vorlagen unter `templates/` sind optional; bestehende
 Dokumentation weiterverwenden. Das leere Check-Template besteht absichtlich keine Pruefung.
@@ -149,8 +160,10 @@ absichtliche Fehler, fehlende Befehle und Timeouts. Keine Kundensoftware wird ve
 > Lies README.md dieses Harness. Installiere den freigegebenen Stand fuer diese
 > Codex-Instanz, pruefe den Status und gleiche Superpowers ab. Danach inventarisiere
 > meinen Webdienst, fuehre vorhandene Checks aus und schlage die wenigen wichtigsten
-> Verbesserungen vor. Priorisiere kritische Nutzerablaeufe, Berechtigungen, Secrets
-> und Abhaengigkeiten. Keine umfassende Neuentwicklung und kein Tool-Zoo.
+> Verbesserungen vor. Arbeite docs/project-onboarding.md ab: integriere passende
+> Tests sowie Gitleaks, OpenGrep und Trivy; richte Greptile bei erlaubter Codeuebermittlung
+> ein oder dokumentiere den frischen Codex-Review als Ersatz. Weise fehlende Bausteine
+> aus. Keine umfassende Neuentwicklung und kein Tool-Zoo.
 
 Referenzen: [Codex AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md),
 [Superpowers, gepinnter Stand](https://github.com/obra/superpowers/tree/5bf4e78011075bcfc0dc295f0724994cd123ee71).
