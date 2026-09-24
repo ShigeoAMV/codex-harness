@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "profile": "internal",
+  "checks": [
+    {
+      "name": "python-tests",
+      "stages": ["dev", "security", "release"],
+      "argv": ["{python}", "-m", "unittest", "discover", "-s", "tests", "-v"],
+      "timeout_seconds": 120
+    }
+  ]
+}
