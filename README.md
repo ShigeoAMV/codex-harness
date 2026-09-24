@@ -6,12 +6,16 @@ risikobasiert pruefen. Keine zusaetzlichen Abos, Python-Pakete oder Hintergrundd
 **Voraussetzungen:** Git, Python 3.11+ und Codex mit Plugin-Unterstuetzung.
 Der Harness aendert keine Full-Access-, Modell-, Account- oder Sandbox-Einstellungen.
 
+**Projekt gemeinsam mit Codex einrichten:** [Hier starten](START-HERE.md).
+Der kurze Startauftrag fuehrt durch Bestandsaufnahme, offene Entscheidungen,
+Priorisierung und Umsetzung mit dir.
+
 ## Auf einer weiteren Maschine starten
 
 ```sh
 git clone https://github.com/ShigeoAMV/codex-harness.git
 cd codex-harness
-git checkout v0.1.1
+git checkout v0.1.2
 ```
 
 Linux:
@@ -157,13 +161,8 @@ absichtliche Fehler, fehlende Befehle und Timeouts. Keine Kundensoftware wird ve
 
 ## Fuer die Debian-Codex-Aufgabe
 
-> Lies README.md dieses Harness. Installiere den freigegebenen Stand fuer diese
-> Codex-Instanz, pruefe den Status und gleiche Superpowers ab. Danach inventarisiere
-> meinen Webdienst, fuehre vorhandene Checks aus und schlage die wenigen wichtigsten
-> Verbesserungen vor. Arbeite docs/project-onboarding.md ab: integriere passende
-> Tests sowie Gitleaks, OpenGrep und Trivy; richte Greptile bei erlaubter Codeuebermittlung
-> ein oder dokumentiere den frischen Codex-Review als Ersatz. Weise fehlende Bausteine
-> aus. Keine umfassende Neuentwicklung und kein Tool-Zoo.
+> Lies START-HERE.md aus https://github.com/ShigeoAMV/codex-harness auf Version
+> v0.1.2 und fuehre das Onboarding mit mir fuer meinen Webdienst durch.
 
 Referenzen: [Codex AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md),
 [Superpowers, gepinnter Stand](https://github.com/obra/superpowers/tree/5bf4e78011075bcfc0dc295f0724994cd123ee71).
