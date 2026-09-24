@@ -4,7 +4,7 @@ Starte Codex im Zielprojekt und gib ihm diesen Auftrag. Bei einem privaten Repos
 braucht die Instanz GitHub-Zugriff oder einen lokalen Clone des Harness.
 
 > Lies START-HERE.md aus https://github.com/ShigeoAMV/codex-harness auf dem
-> freigegebenen Stand v0.1.3 und fuehre das folgende Onboarding mit mir fuer das
+> freigegebenen Stand v0.1.4 und fuehre das folgende Onboarding mit mir fuer das
 > aktuelle Projekt durch. Bleibe schlank, priorisiere die groessten Hebel und nutze
 > vorhandene Loesungen weiter.
 
@@ -30,6 +30,10 @@ braucht die Instanz GitHub-Zugriff oder einen lokalen Clone des Harness.
    Skills und Shannon/Strix nur bei konkretem Nutzen. Keine Zusatzabos. Waehle wenige
    priorisierte Schritte mit sichtbaren Abnahmekriterien und unterscheide schnelle
    Entwicklungschecks von umfassenderen Release-Pruefungen.
+   Pruefe auch die **grossen Architekturhebel** der Anleitung: bei oeffentlichen
+   Diensten mit Konten Auth as a Service ausdruecklich evaluieren; bei weiteren
+   kritischen Aufgaben passende bewaehrte Komponenten. Vorhandenes weiterverwenden,
+   Kosten und verbleibende Verantwortung benennen, keine Dienste pauschal einfuehren.
    Bei grossen oder wenig abgesicherten bestehenden Anwendungen nutze den Abschnitt
    **Bestehende Anwendung stabilisieren** der Anleitung: Altbestand bereichsweise
    erfassen, risikobasiert pruefen und reparieren, mit sichtbarem Pruefstand.

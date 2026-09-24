@@ -21,6 +21,31 @@ documented. Unsupported stacks or inapplicable targets need a short explanation,
 not dummy checks. A missing applicable check remains a visible gap. Do not purchase
 services or broaden code access to remove a gap.
 
+## Prefer established components for high-risk responsibilities
+
+At onboarding or when adding a relevant capability, identify which security-critical
+responsibilities can be handled by maintained components rather than bespoke code.
+For public services with user accounts, explicitly evaluate Auth as a Service first,
+alongside suitable existing framework auth or an identity provider. If accounts are
+not needed, do not add them. Preserve sound existing auth rather than migrating by default.
+Use maintained protocol libraries/SDKs; assess MFA, recovery and session requirements.
+The application still validates tokens/sessions and enforces resource permissions and
+tenant boundaries server-side, with negative tests. Never implement custom cryptography.
+
+Other high-leverage options, only where applicable: parameterized database access and
+transaction support; hosted payment checkout with verified, idempotent webhooks;
+private object storage with authorized uploads/downloads and size/type limits;
+maintained reverse proxy/platform for TLS and abuse controls; managed databases/hosting
+where patching, backup and recovery responsibilities would otherwise exceed capacity.
+Keep admin/debug/database endpoints private where possible. Verify restore capability,
+alerts and provider responsibilities; an external service is not a security guarantee.
+
+For each relevant choice, briefly record reuse/service/self-hosting, benefit, residual
+application duties, operating cost at expected usage, data policy and migration/exit
+options. No paid service, new data transfer or automatic migration without the required
+authorization. Free tiers are not guaranteed zero-cost production infrastructure.
+Self-hosted maintained software is a valid option when its operating duties are owned.
+
 ## Adopt an existing application
 
 1. Read repository instructions and identify entrypoints, stack, test/build commands,

@@ -10,6 +10,45 @@ Tools und Dokumentation weiterverwenden. Keine grossflaechige Neuentwicklung.
 - Kritische Nutzerablaeufe, Berechtigungs-/Tenant-Grenzen und sensible Daten kurz
   festhalten. Intern/public und moeglichen Schadensumfang bestimmen.
 
+### Grosse Architekturhebel: bewaehrte Komponenten statt Eigenbau
+
+Bei der Bestandsaufnahme und vor neuen sicherheitskritischen Funktionen diese
+Entscheidungen explizit pruefen. Nur relevante Bausteine betrachten; keine neue
+Dienstelandschaft und keine Migration ohne nachweisbaren Nutzen.
+
+| Falls das Projekt ... | Bevorzugt evaluieren | Bleibt Aufgabe der Anwendung / des Betreibers |
+| --- | --- | --- |
+| oeffentliche Benutzerkonten braucht | Auth as a Service; alternativ geeignete vorhandene Framework-Auth oder Identity-Provider | Tokens/Sessions korrekt validieren, Rechte und Tenant-Grenzen serverseitig pruefen, negative Zugriffstests |
+| Daten speichert | Gepflegte Datenzugriffsbibliothek mit parametrisierten Abfragen und Transaktionen | Ressourcenbesitz, Dateninvarianten, atomare Aenderungen und Migrationstests; ein ORM macht rohes SQL nicht automatisch sicher |
+| Zahlungen annimmt | Gehosteter Checkout eines etablierten Zahlungsanbieters | Preise/Bestellungen serverseitig zuordnen, Webhooks verifizieren und idempotent verarbeiten; Browser-Erfolgsmeldung nicht als Zahlungsbeleg behandeln |
+| Dateien annimmt | Bewaehrte Upload-Komponenten und privater Objektspeicher | Zugriff, Groessen-/Typgrenzen und sichere Auslieferung; ein Speicheranbieter macht Uploads nicht automatisch harmlos |
+| oeffentlich betrieben wird | Gepflegter Reverse Proxy oder Plattform fuer TLS und passende Rate-/Ressourcenlimits | Admin-/Debug-/DB-Zugaenge nicht unnoetig exponieren; Limits an teuren und missbrauchsrelevanten Endpunkten testen |
+| wichtige Daten/verbindlichen Betrieb hat | Managed Datenbank/Hosting pruefen, wenn eigener Patch-/Backup-Betrieb nicht verlaesslich abgedeckt ist | Zustaendigkeiten, Wiederherstellung und wenige handlungsrelevante Fehler-/Ausfallalarme nachweisen |
+
+**Auth ist eine ausdrueckliche Architekturentscheidung:** bei oeffentlichen Diensten
+mit Konten Managed Auth zuerst evaluieren, aber keine Konten hinzufuegen, wenn sie
+nicht gebraucht werden. MFA, Account-Recovery, Sessions und Missbrauchsschutz passend
+zum Risiko betrachten. Gepflegte SDKs/Protokollbibliotheken verwenden, keine eigene
+Kryptografie entwickeln. Eine bewaehrte vorhandene Loesung nicht reflexartig ersetzen.
+Authentifizierung beantwortet, wer jemand ist; die Anwendung muss weiterhin pruefen,
+auf welche konkrete Ressource diese Person zugreifen darf.
+
+Kurz mit dem Nutzer abwaegen: Wiederverwendung, Dienst oder Self-Hosting; erwartete
+Risikoreduktion, verbleibender Betriebsaufwand, Datenschutz, Kosten bei realistischem
+Wachstum und Wechselmoeglichkeit. Free-Tier ist keine dauerhafte Nullkosten-Garantie.
+Die Vorgabe ohne Zusatzabos bleibt bestehen: keinen kostenpflichtigen Dienst buchen,
+keine Daten uebermitteln und keine Migration allein aus dieser Empfehlung ableiten.
+Eine gepflegte selbst betriebene Loesung ist gueltig, wenn ihre Betriebsaufgaben
+abgedeckt sind. Entscheidung und offene Pflichten in vorhandener Projektdokumentation
+festhalten; keine separate umfangreiche Bewertung fuer jeden Baustein.
+
+Technische Referenzen: OWASP zu [Authentifizierung](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html),
+[Berechtigungen](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html),
+[SQL-Injection](https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html),
+[Uploads](https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html),
+[Zahlungsintegration](https://cheatsheetseries.owasp.org/cheatsheets/Third_Party_Payment_Gateway_Integration_Cheat_Sheet.html) und
+[API-Sicherheit](https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html).
+
 ### Bestehende Anwendung stabilisieren
 
 Bei grossen oder wenig abgesicherten Altbestaenden diesen Ablauf mit dem Nutzer
