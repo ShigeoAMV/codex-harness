@@ -84,6 +84,14 @@ priorisieren und mit den folgenden Test-/Scanner-Schritten verbinden:
 
 - Die wichtigsten bisher ungeschuetzten Ablaeufe und negativen Berechtigungsfaelle
   testen. Bekannte Fehler nicht als erwartetes Verhalten festschreiben.
+- **Frontend als manipulierbar behandeln:** Berechtigungen, Eingaben und
+  Geschaeftsregeln muessen serverseitig gelten, auch ohne die vorgesehene UI.
+  In der Testumgebung direkte API-Anfragen mit fremden Ressourcen-/Tenant-IDs,
+  manipulierten Rollen/Preisen, fehlenden/ungueltigen Sessions und umgangener
+  Formularvalidierung pruefen, soweit anwendbar. Erwartung: Ablehnung oder korrekt
+  serverseitig bestimmte Werte, keine unberechtigte Datenfreigabe oder Zustandsaenderung.
+  Keine privilegierten Backend-/Datenbank-Schluessel im Browser ausliefern. Getrennte
+  Domains/Repositories, versteckte Buttons und CORS ersetzen keine Zugriffskontrolle.
 - **Gitleaks:** geaenderte Inhalte schnell pruefen; vor Release relevante Git-Historie.
 - **OpenGrep:** zur Sprache passende Regeln und Engine auf konkrete Versionen pinnen.
 - **Trivy:** Dependencies sowie vorhandene Container/IaC pruefen. Blockierende

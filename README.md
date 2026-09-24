@@ -15,7 +15,7 @@ Priorisierung und Umsetzung mit dir.
 ```sh
 git clone https://github.com/ShigeoAMV/codex-harness.git
 cd codex-harness
-git checkout v0.1.4
+git checkout v0.1.5
 ```
 
 Linux:
@@ -162,7 +162,7 @@ absichtliche Fehler, fehlende Befehle und Timeouts. Keine Kundensoftware wird ve
 ## Fuer die Debian-Codex-Aufgabe
 
 > Lies START-HERE.md aus https://github.com/ShigeoAMV/codex-harness auf Version
-> v0.1.4 und fuehre das Onboarding mit mir fuer meinen Webdienst durch.
+> v0.1.5 und fuehre das Onboarding mit mir fuer meinen Webdienst durch.
 
 Referenzen: [Codex AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md),
 [Superpowers, gepinnter Stand](https://github.com/obra/superpowers/tree/5bf4e78011075bcfc0dc295f0724994cd123ee71).

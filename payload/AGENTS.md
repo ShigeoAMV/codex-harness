@@ -20,6 +20,10 @@ silently overwriting them. These preferences tailor skill workflows to the task.
   search for related variants, and verify the original failure is gone.
 - Existing applications: inventory and protect critical behavior before broad
   refactoring. Record known defects; do not bless them as requirements.
+- Treat the frontend as fully attacker-controlled. Enforce authorization, input
+  validation and business rules server-side even when clients bypass the UI and
+  call APIs directly. Frontend checks are not a security boundary; never ship
+  privileged backend credentials to the browser. Test relevant tampered requests.
 - Homelab/internal work can be lightweight. Sensitive data, privileges and impact
   still matter. Public/production release needs explicit, reproducible evidence.
 - Prefer maintained security components over custom implementations. For public

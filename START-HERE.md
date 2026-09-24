@@ -4,7 +4,7 @@ Starte Codex im Zielprojekt und gib ihm diesen Auftrag. Bei einem privaten Repos
 braucht die Instanz GitHub-Zugriff oder einen lokalen Clone des Harness.
 
 > Lies START-HERE.md aus https://github.com/ShigeoAMV/codex-harness auf dem
-> freigegebenen Stand v0.1.4 und fuehre das folgende Onboarding mit mir fuer das
+> freigegebenen Stand v0.1.5 und fuehre das folgende Onboarding mit mir fuer das
 > aktuelle Projekt durch. Bleibe schlank, priorisiere die groessten Hebel und nutze
 > vorhandene Loesungen weiter.
 

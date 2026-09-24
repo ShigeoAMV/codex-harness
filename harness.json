@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": "0.1.4",
+  "version": "0.1.5",
   "superpowers": {
     "repository": "https://github.com/obra/superpowers",
     "version": "6.4.1",

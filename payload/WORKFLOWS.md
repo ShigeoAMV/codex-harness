@@ -32,6 +32,15 @@ Use maintained protocol libraries/SDKs; assess MFA, recovery and session require
 The application still validates tokens/sessions and enforces resource permissions and
 tenant boundaries server-side, with negative tests. Never implement custom cryptography.
 
+Treat browser code, client state and request fields as attacker-controlled. The
+backend must enforce permissions, validate input and preserve business invariants
+without relying on hidden buttons, disabled fields or frontend validation. Never
+ship privileged database/service credentials in frontend bundles. Separate domains,
+repositories and CORS settings do not replace authorization. In authorized test
+environments, exercise the API directly: foreign resource/tenant IDs, forged role or
+price fields, missing/invalid sessions and bypassed UI validation. Verify rejection
+or safe server-derived values, with no unauthorized data exposure or state changes.
+
 Other high-leverage options, only where applicable: parameterized database access and
 transaction support; hosted payment checkout with verified, idempotent webhooks;
 private object storage with authorized uploads/downloads and size/type limits;
