@@ -30,7 +30,9 @@ simuliert; diese Tests belegen keine echte Marketplace-Verbindung.
 Offizielle GitHub-Dateien, Git-Refs, Release-Artefakte und PyPI sind erreichbar.
 Direkte Abrufe von `developers.openai.com`, `openai.com`, `api.github.com`,
 `docs.github.com`, Greptile-/CodeRabbit-/Qodo-Preisseiten und `semgrep.dev/pricing`
-wurden vom Netzwerkproxy mit **403** abgewiesen. Wo moeglich wurden die offiziellen
+wurden bei der urspruenglichen Recherche vom Netzwerkproxy mit **403** abgewiesen.
+Nach Cloud-Veroeffentlichung ist `api.github.com` erreichbar; die anderen
+Recherchegrenzen wurden damit nicht erneut geprueft. Wo moeglich wurden die offiziellen
 Dokumentationsquellen auf GitHub gelesen. TLS-/Checksum-Pruefung blieb aktiv.
 Kein unabhaengiger aktueller Vergleich aller Reviewer war damit verifizierbar;
 **keine Rangliste der Erkennungsqualitaet und keine gesicherten Preisangaben**.
@@ -119,11 +121,15 @@ Ausnahmen und **Hash des tatsaechlich freizugebenden Artefakts**. Nach Freigabe
 nicht neu bauen. Signatur/Attestation nur in dieser getrennten Instanz; eine
 Signatur auf einem vom ungeprueften Build selbst behaupteten PASS schafft keine
 Vertrauensgrenze. Branch Protection/Rulesets mit erforderlichen Checks und Review
-fuer Workflow-/Policy-Dateien sind extern zu konfigurieren und hier nicht bestaetigt.
+fuer Workflow-/Policy-Dateien sind extern zu konfigurieren. Das inzwischen aktive
+`main`-Ruleset erzwingt PRs und CI, aber keine Review-Freigabe (Anzahl 0); es
+stellt damit noch keine unabhaengige Freigabe fuer Workflow-/Policy-Aenderungen dar.
 
 ## Validierung dieser Aenderungen
 
-Geprueft wurde der veraenderte Arbeitsstand, keine neue veroeffentlichte Version.
+Die lokale Erstvalidierung pruefte den veraenderten Arbeitsstand. Die Aenderungen
+sind inzwischen auf `main` veroeffentlicht und in GitHub CI geprueft (siehe unten),
+aber nicht Bestandteil des alten Tags `v0.1.6`.
 Acht Tests kamen hinzu. Die bisherigen Tests der festen Superpowers-Version und
 des Commit-Pins wurden gemaess Nutzervorgabe durch versionsunabhaengige Inventur-
 und Quellenpruefungen ersetzt; die uebrigen Assertions wurden nicht abgeschwaecht.
@@ -155,15 +161,25 @@ fuer Commit `6381c4357f8ff4d22b51eaa76bd39b1b056fecb9` bestand am 2026-10-11:
 alle vier Linux-/Windows-Testjobs und `Lint and secrets`, fuenf Report-Artefakte.
 Die Web-Zusammenfassung bestaetigt den Erfolg; detaillierte Joblogs verlangen
 Anmeldung. Node-20-Warnungen fuehrten zur Aktualisierung von Checkout/Upload auf
-die offiziellen, erneut SHA-gepinnten Node-24-Actions. Ergebnisse fuer diese Pins
-separat im [CI-Verlauf](https://github.com/ShigeoAMV/codex-harness/actions/workflows/ci.yml)
-pruefen; der verlinkte erste Lauf belegt die vorherigen Pins.
+die offiziellen, erneut SHA-gepinnten Node-24-Actions. Auch der
+[zweite GitHub-Lauf](https://github.com/ShigeoAMV/codex-harness/actions/runs/38132881892)
+fuer `3b217e8c285434d5b43a95b0ad07c6e58e6e43f3` bestand mit allen fuenf Jobs.
+Dieser zweite Lauf belegt die aktualisierten Action-Pins.
 
-**Offen:** Branch-/Workflow-Schutz, Plugininventur/Upgrade-Kompatibilitaet und
-aktuelle Anbieterpreise/Kontingente. Die GitHub-API war in der Cloud durch die
-Netzwerkregeln gesperrt; `api.github.com` wurde im Umgebungsentwurf ergaenzt.
-Cloud-Publish braucht die Produktoberflaeche; die lokale native Plugininstallation
-ist schreibgeschuetzt. Diese externen Schritte gelten nicht als erledigt.
+**Nachtraeglich verifiziert, 2026-10-11:** Die Cloud-Konfiguration wurde
+veroeffentlicht; die neu gestartete Umgebung enthielt Commit `3b217e8` und bestand
+45 Tests (44 bestanden, ein Windows-Test unter Linux uebersprungen). Die GitHub-API
+ist erreichbar. Der Nutzer richtete das `main`-Ruleset ueber die GitHub-Oberflaeche
+ein, da der Integration die Administrationsberechtigung fuer Branch Protection fehlt.
+Die effektiven Regeln wurden anschliessend per API gelesen: PR-Pflicht, genau die
+vier Matrix-Testnamen und `Lint and secrets`, jeweils GitHub Actions als Quelle,
+aktueller PR-Branch erforderlich, Loeschen und Force-Push gesperrt.
+
+**Verbleibende Grenzen:** Kein technisch erforderlicher Review (0 Freigaben),
+keine getrennte Release-Identitaet, nicht bestaetigte native Plugininventur/
+Upgrade-Kompatibilitaet und aktuelle Anbieterpreise/Kontingente. Die lokale native
+Plugininstallation ist schreibgeschuetzt; ein erfolgreiches Superpowers-Update
+wird nicht behauptet.
 Lokales Actionlint validiert Syntax, nicht GitHub-Berechtigungen oder Runnerbetrieb.
 Es wurden keine Web-/API-Ziele gescannt, kein OpenGrep-/Trivy-/CodeQL-Vollscan
 durchgefuehrt und keine Produktion veraendert. Deren fehlende Anwendungsziele bzw.

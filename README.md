@@ -1,5 +1,7 @@
 # Codex Harness
 
+[![Harness CI](https://github.com/ShigeoAMV/codex-harness/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ShigeoAMV/codex-harness/actions/workflows/ci.yml)
+
 Ein gemeinsamer, schlanker Codex-Standard fuer Windows und Linux. Schnell entwickeln,
 risikobasiert pruefen. Keine zusaetzlichen Abos, Python-Pakete oder Hintergrunddienste.
 
@@ -13,10 +15,16 @@ Priorisierung und Umsetzung mit dir.
 ## Auf einer weiteren Maschine starten
 
 ```sh
-git clone https://github.com/ShigeoAMV/codex-harness.git
+git clone --branch main https://github.com/ShigeoAMV/codex-harness.git
 cd codex-harness
-git checkout v0.1.6
+git rev-parse HEAD
 ```
+
+`main` enthaelt den aktuellen Stand. Die ausgegebene Commit-SHA fuer weitere
+Maschinen festhalten; vor Installation den zugehoerigen CI-Lauf pruefen. Der alte
+Tag `v0.1.6` enthaelt die nachfolgenden Runner-, CI- und Superpowers-Aenderungen
+nicht. Die Manifestversion allein identifiziert diese Weiterentwicklung nicht;
+massgeblich ist die Commit-SHA.
 
 Linux:
 
@@ -211,9 +219,14 @@ Werkzeugdownloads per Version und SHA-256 gepinnt. Keine Runtime-Pakete erforder
 Das lokale `harness.checks.json` startet in **allen drei Stufen nur die Python-Tests**;
 die CI-Scanner sind separate Jobs, keine Security-Garantie fuer angebundene Projekte.
 
-GitHub-Checks und Branch Protection werden durch eine lokale Workflow-Datei noch
-nicht aktiviert oder nachgewiesen. Nach Push alle vier `Tests (...)`-Checks und
-`Lint and secrets` pruefen und als Pflichtchecks konfigurieren. Vertraute Reviews
+Fuer dieses Repository wurde am 2026-10-11 das aktive Ruleset fuer `main`
+geprueft: Pull Requests, alle vier `Tests (...)`-Checks und `Lint and secrets`
+aus GitHub Actions sowie ein aktueller PR-Branch sind erforderlich. Loeschen und
+Force-Pushes sind gesperrt. Die Zahl erforderlicher Review-Freigaben ist 0; ein
+separater Review bleibt Arbeitsablauf, wird also nicht technisch erzwungen.
+
+Bei angebundenen Projekten CI und Rulesets separat einrichten und pruefen; diese
+Einstellungen werden durch den Harness nicht uebertragen. Vertraute Reviews
 fuer Workflow-/Policy-Aenderungen, geschuetzte Branches und eine separate
 Release-Identitaet sind Einstellungen des Zielrepositories. Fork-PRs laufen auf
 kurzlebigen GitHub-Runnern mit Leserechten, ohne Secrets oder Deployment.
@@ -223,10 +236,11 @@ Recherche, begruendete Nicht-Aenderungen und aktuelle Pruefgrenzen:
 [kritische Bewertung](docs/evaluation.md). Optional:
 [Web/API-Abnahme](templates/web-api-profile.md).
 
-## Fuer die Debian-Codex-Aufgabe
+## Startauftrag fuer ein Zielprojekt
 
-> Lies START-HERE.md aus https://github.com/ShigeoAMV/codex-harness auf Version
-> v0.1.6 und fuehre das Onboarding mit mir fuer meinen Webdienst durch.
+> Lies START-HERE.md aus https://github.com/ShigeoAMV/codex-harness auf dem
+> aktuellen Stand von main, halte die verwendete Commit-SHA fest und fuehre
+> das Onboarding mit mir fuer mein Projekt durch.
 
 Referenzen: [Codex AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md),
 [Superpowers, aktueller Stand](https://github.com/obra/superpowers).

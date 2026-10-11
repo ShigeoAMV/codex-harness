@@ -1,4 +1,10 @@
-# Portable baseline implementation
+# Historical implementation: original portable baseline
+
+This records the original implementation, not the current setup instructions or
+repository visibility. For current installation use [README](../README.md), for
+project onboarding [START-HERE](../START-HERE.md), and for subsequent changes and
+verified status [evaluation](evaluation.md). Branch names and deployment tasks
+below describe that initial work.
 
 Approved brief: shared Codex instructions for Windows/Linux, full-access development,
 risk-based checks, no additional subscriptions. Existing applications remain untouched.
