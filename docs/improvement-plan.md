@@ -42,5 +42,9 @@ jemanden, der den Runner bzw. Workflow aendern kann.
 Besondere Review-Faelle: nie gestartete Checks bei Vorbedingungsfehlern;
 veraenderter Checkout nach erfolgreichen Befehlen; ungueltige Konfiguration statt
 stillem PASS; fehlerhafte Toolinstallation; keine Tokens/Secrets in PR-Ausfuehrung.
-Windows-CI und Branch Protection gelten erst nach einem echten GitHub-Lauf bzw.
-gepruefter Repository-Einstellung als aktiv. Lokale Tests ersetzen diesen Nachweis nicht.
+Abgeschlossen am 2026-10-11: Die [GitHub-CI](https://github.com/ShigeoAMV/codex-harness/actions/runs/38132881892)
+bestand auf Linux und Windows. Das aktive `main`-Ruleset wurde ueber die GitHub-API
+geprueft: PR-Pflicht, fuenf erforderliche GitHub-Actions-Checks, aktueller PR-Branch,
+kein Loeschen oder Force-Push. Review-Freigaben sind mit 0 konfiguriert; der separate
+Review wird nicht durch dieses Ruleset erzwungen. Details und verbleibende Grenzen
+stehen in der [Bewertung](evaluation.md).
