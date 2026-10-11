@@ -24,7 +24,7 @@ jobs:
         os: [ubuntu-24.04, windows-2025]
         python: ['3.11', '3.14']
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -41,7 +41,7 @@ jobs:
           fi
       - name: Save development evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: checks-${{ matrix.os }}-${{ matrix.python }}
           path: .harness-evidence/result.json
@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -104,7 +104,7 @@ jobs:
             --report-format json --report-path .harness-evidence/gitleaks.json
       - name: Save redacted secret scan report
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: gitleaks-report
           path: .harness-evidence/gitleaks.json

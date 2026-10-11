@@ -148,10 +148,22 @@ die vollstaendige Suite einschliesslich realem CLI-Test fuer den erwarteten Comm
 Identifikation der geprueften Ausfuehrungsdateien (SHA-256, keine Signatur):
 
 - `checks.py`: `de48b7484ac03dfb3d16df9a9cd37df55798c17f587f277cdd5bcc1fad91de86`
-- `.github/workflows/ci.yml`: `64ccf9092ff7d3d34b06f47d4fc113498375935c779ed592c2a26e10127688e7`
+- `.github/workflows/ci.yml` nach Node-24-Umstellung: `04ec6e72755cd4dc24e11ef538c0e20e5075dc5eceda2ddccf1af03bfbf18ffd`
 
-**Offen:** echter Windows-/GitHub-Actions-Lauf, Branch-/Workflow-Schutz,
-Plugininventur/Upgrade-Kompatibilitaet und aktuelle Anbieterpreise/Kontingente.
+Der [erste echte GitHub-Lauf](https://github.com/ShigeoAMV/codex-harness/actions/runs/38132650282)
+fuer Commit `6381c4357f8ff4d22b51eaa76bd39b1b056fecb9` bestand am 2026-10-11:
+alle vier Linux-/Windows-Testjobs und `Lint and secrets`, fuenf Report-Artefakte.
+Die Web-Zusammenfassung bestaetigt den Erfolg; detaillierte Joblogs verlangen
+Anmeldung. Node-20-Warnungen fuehrten zur Aktualisierung von Checkout/Upload auf
+die offiziellen, erneut SHA-gepinnten Node-24-Actions. Ergebnisse fuer diese Pins
+separat im [CI-Verlauf](https://github.com/ShigeoAMV/codex-harness/actions/workflows/ci.yml)
+pruefen; der verlinkte erste Lauf belegt die vorherigen Pins.
+
+**Offen:** Branch-/Workflow-Schutz, Plugininventur/Upgrade-Kompatibilitaet und
+aktuelle Anbieterpreise/Kontingente. Die GitHub-API war in der Cloud durch die
+Netzwerkregeln gesperrt; `api.github.com` wurde im Umgebungsentwurf ergaenzt.
+Cloud-Publish braucht die Produktoberflaeche; die lokale native Plugininstallation
+ist schreibgeschuetzt. Diese externen Schritte gelten nicht als erledigt.
 Lokales Actionlint validiert Syntax, nicht GitHub-Berechtigungen oder Runnerbetrieb.
 Es wurden keine Web-/API-Ziele gescannt, kein OpenGrep-/Trivy-/CodeQL-Vollscan
 durchgefuehrt und keine Produktion veraendert. Deren fehlende Anwendungsziele bzw.
