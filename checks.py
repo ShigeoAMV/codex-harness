@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
+import re
 import signal
 import subprocess
 import sys
@@ -14,7 +15,7 @@ STAGES = {'dev', 'security', 'release'}
 
 
 def validate(config, stage):
-    if not isinstance(config, dict) or config.get('schema') != 1:
+    if not isinstance(config, dict) or type(config.get('schema')) is not int or config['schema'] != 1:
         raise HarnessError('Expected checks schema 1')
     if config.get('profile') not in ('internal', 'public'):
         raise HarnessError('profile must be internal or public')
@@ -48,7 +49,7 @@ def git_identity(project):
                               text=True, encoding='utf-8', timeout=15)
         return proc.stdout.strip() if proc.returncode == 0 else None
     try:
-        commit = run('rev-parse', 'HEAD')
+        commit = run('rev-parse', '--verify', 'HEAD^{commit}')
         dirty = run('status', '--porcelain', '--untracked-files=normal')
         return {'commit': commit, 'dirty': bool(dirty) if dirty is not None else None}
     except (OSError, subprocess.TimeoutExpired):
@@ -65,7 +66,8 @@ def run_check(check, project):
             try:
                 result['exit_code'] = proc.wait(timeout=check['timeout_seconds'])
                 result['status'] = 'PASS' if proc.returncode == 0 else 'FAIL'
-            except (subprocess.TimeoutExpired, KeyboardInterrupt):
+            except (subprocess.TimeoutExpired, KeyboardInterrupt) as exc:
+                result['reason'] = 'timeout' if isinstance(exc, subprocess.TimeoutExpired) else 'interrupted'
                 try:
                     if os.name == 'nt':
                         killer = Path(os.environ.get('SystemRoot', r'C:\Windows')) / 'System32/taskkill.exe'
@@ -80,36 +82,49 @@ def run_check(check, project):
                 finally:
                     proc.kill()
                     proc.wait(timeout=10)
-                result['error'] = 'Check timed out or was interrupted'
+                result['error'] = 'Check timed out' if result['reason'] == 'timeout' else 'Check interrupted'
     except OSError as exc:
+        result['reason'] = 'execution_error'
         result['error'] = str(exc)
     result['seconds'] = round(time.monotonic() - start, 3)
     return result
 
 
-def verify(project, stage):
+def verify(project, stage, expected_commit=None):
     project = project.absolute()
     evidence = project / '.harness-evidence'
     report = {'schema': 1, 'stage': stage, 'status': 'ERROR', 'checks': [],
+              'not_run': [], 'selection_complete': False,
               'started_at': datetime.now(timezone.utc).isoformat(),
+              'runtime': {'python': sys.version.split()[0], 'platform': sys.platform},
               'authority': 'development evidence only; not a release approval'}
+    selected = []
     # Single writer: another run must not replace this run's report.
     with locked(evidence):
         report_path = evidence / 'result.json'
         atomic_write(report_path, json_bytes(report))  # invalidate any stale PASS first
         try:
+            report['runner_sha256'] = digest(read(Path(__file__).absolute()))
             if stage not in STAGES:
                 raise HarnessError('Unknown stage')
+            if expected_commit is not None:
+                report['expected_commit'] = expected_commit
+                if (stage != 'release' or not isinstance(expected_commit, str)
+                        or not re.fullmatch(r'(?:[0-9a-f]{40}|[0-9a-f]{64})', expected_commit)):
+                    raise HarnessError('--expected-commit requires release and a full lowercase commit SHA')
             raw = read(project / 'harness.checks.json')
             if raw is None:
                 raise HarnessError('Missing harness.checks.json')
             report['config_sha256'] = digest(raw)
             config = json.loads(raw)
             selected = validate(config, stage)
+            report['selection_complete'] = True
             report['profile'] = config['profile']
             report['git'] = git_identity(project)
             if stage == 'release' and (not report['git']['commit'] or report['git']['dirty'] is not False):
                 raise HarnessError('Release checks require a clean Git commit; ignore .harness-evidence/')
+            if expected_commit is not None and report['git']['commit'] != expected_commit:
+                raise HarnessError(f"Expected commit {expected_commit}, found {report['git']['commit']}")
             for check in selected:
                 result = run_check(check, project)
                 report['checks'].append(result)
@@ -122,12 +137,13 @@ def verify(project, stage):
                 if read(project / 'harness.checks.json') != raw:
                     raise HarnessError('Check configuration changed during verification')
                 report['status'] = 'PASS'
-            executed = {item['name'] for item in report['checks']}
-            report['not_run'] = [item['name'] for item in selected if item['name'] not in executed]
         except (HarnessError, OSError, ValueError, TypeError, subprocess.TimeoutExpired) as exc:
             report['status'] = 'ERROR'
             report['error'] = str(exc)
         finally:
+            executed = {item['name'] for item in report['checks']}
+            report['not_run'] = [item['name'] for item in selected if item['name'] not in executed]
+            report['finished_at'] = datetime.now(timezone.utc).isoformat()
             atomic_write(report_path, json_bytes(report))
     print(report['status'] + ': ' + str(report_path), flush=True)
     if report.get('error'):

@@ -36,27 +36,44 @@ Bei Bedarf `HARNESS_PYTHON` auf den Python-Pfad setzen. `CODEX_HOME` wird beacht
 alternativ `--codex-home PATH` verwenden. Jede Codex-Instanz braucht die Installation
 in ihrem eigenen Benutzer-/Codex-Verzeichnis. Danach eine neue Codex-Aufgabe starten.
 
-### Superpowers: vorhandene Installation behalten
+### Superpowers: stets aktuell halten
 
-Zuerst die vorhandenen Plugins inventarisieren. **Eine aktive Superpowers-Version
-6.4.1 aus `openai-curated-remote` oder `superpowers-dev` reicht.** Eine passende
-Installation weiterverwenden; kein Quellenwechsel und keine zweite Installation
-nur fuer den Harness. Eine bereits deaktivierte zweite Kopie darf deaktiviert bleiben.
+**Superpowers soll stets aktuell sein; der Harness schreibt keine Version und
+keinen Commit vor.** Genau eine aktive Installation aus `openai-curated-remote`
+oder dem offiziellen `superpowers-dev` weiterverwenden. Bei Aufgabenstart native
+Plugin-Updates pruefen und verfuegbare Aktualisierungen anwenden. Die kuratierte
+Installation ueber die Codex-Pluginverwaltung aktualisieren; deren bereitgestellter
+Stand kann vom Upstream abweichen. Keine zweite Kopie nur fuer den Harness anlegen.
 
 Desktop und CLI koennen unterschiedliche Plugin-Kataloge zeigen. Ein fehlender
 CLI-Eintrag beweist deshalb nicht, dass Superpowers in der App fehlt. Bei unklarer
 Inventur die Einschraenkung melden und zuerst die tatsaechlich verwendete Umgebung
-pruefen. Nicht vorsorglich ein weiteres Plugin installieren. Abweichende Versionen
-sichtbar machen und gezielt klaeren; sie verlangen keinen Marketplace-Wechsel.
+pruefen. Nicht vorsorglich ein weiteres Plugin installieren. Ist eine Aktualisierung
+nicht pruefbar oder moeglich, die Einschraenkung melden und die vorhandene
+Installation weiterverwenden, ohne sie als nachweislich aktuell zu bezeichnen.
 
 **Nur wenn Superpowers tatsaechlich fehlt:** lokale Codex-`config.toml` sichern und
-den offiziellen Marketplace auf den geprueften Commit pinnen:
+den offiziellen Marketplace ohne Versions-/Commit-Pin einrichten:
 
 ```sh
-codex plugin marketplace add obra/superpowers --ref 5bf4e78011075bcfc0dc295f0724994cd123ee71
+codex plugin marketplace add obra/superpowers --ref main
 codex plugin add superpowers@superpowers-dev
 codex plugin list --json
 ```
+
+Fuer eine bestehende offizielle `superpowers-dev`-Installation einen alten festen
+`ref` nach Sicherung der Konfiguration gezielt auf `main` umstellen. Quelle und
+andere Einstellungen erhalten. Anschliessend den nativen Updateweg verwenden:
+
+```sh
+codex plugin marketplace upgrade superpowers-dev
+codex plugin add superpowers@superpowers-dev
+codex plugin list --json
+```
+
+Die Befehlsform ist mit Codex CLI 0.159.2 geprueft. Die konkrete Aktualisierung
+braucht eine schreibbare native Plugininstallation; der Cloud-Skillkatalog ist
+keine solche lokale Installation. Nach einem Update neue Codex-Aufgabe starten.
 
 Diese nativen Plugin-Befehle werden durch `harness rollback` nicht rueckgaengig
 gemacht. Bestehende Marketplace-Registrierungen nicht blind ersetzen. Sind wirklich
@@ -65,7 +82,7 @@ bleiben erhalten. Qodo ist keine Abhaengigkeit und wird vom Harness nicht aufger
 
 ## Updates und Rollback
 
-Updates sind bewusst, nicht automatisch. Auf allen Rechnern denselben freigegebenen
+Updates des **Harness selbst** sind bewusst, nicht automatisch. Auf allen Rechnern denselben freigegebenen
 Commit verwenden. Zuerst dessen Diff ansehen, dann:
 
 ```sh
@@ -87,9 +104,12 @@ ausserhalb des Blocks pflegen. `AGENTS.override.md` wird als Vorrangkonflikt gem
 Projekt-/Firmenregeln und MCP-Konfigurationen werden weder ersetzt noch synchronisiert.
 Semantische Widersprueche brauchen einen Review; `status` erkennt Dateidrift, keine Bedeutung.
 `status` prueft ausserdem genau eine aktive Superpowers-Installation aus den
-akzeptierten Quellen in der erwarteten Version. Nur fuer eine aktive
-`superpowers-dev`-Installation wird zusaetzlich deren Marketplace-Commit-Pin geprueft.
-Die kuratierte Installation braucht keine zusaetzliche Marketplace-Registrierung. Es ist eine Inventur, kein Integritaetsnachweis jedes Plugin-Cachefiles.
+akzeptierten Quellen und bei `superpowers-dev` die offizielle Git-Quelle.
+Die gemeldete Version dient nur der Inventur; es gibt keine Versions- oder
+Commit-Pflicht. `freshness: "not_checked"` bedeutet, dass dieser lokale Status
+keinen Online-Updatecheck durchfuehrt. Die kuratierte Installation braucht keine
+zusaetzliche Marketplace-Registrierung. Die Inventur ist kein Integritaetsnachweis
+jedes Plugin-Cachefiles.
 
 Lokale Sicherungen und Zustand: `CODEX_HOME/harness/`. Bei einem unterbrochenen Lauf
 erst `status`, Sicherungen und laufende Prozesse pruefen. Eine verwaiste `install.lock`
@@ -99,15 +119,17 @@ bereit. Sie bleiben lokal und werden nicht in dieses Repository hochgeladen.
 
 ## Ein bestehendes Projekt anbinden
 
-Der Standard ist **Superpowers + Greptile mit Codex-Review als Ersatz + Gitleaks,
-OpenGrep und Trivy**. Greptile wird bei der Projektanbindung eingerichtet oder der
-Verzicht begruendet. Kritische Aenderungen brauchen einen separaten Review; ein
-bestimmter Anbieter ist dafuer nicht zwingend. ZAP/Schemathesis kommen bei passenden
-Web-/API-Projekten dazu, Shannon/Strix erst spaeter.
+Der Standard ist **Superpowers + separater Codex-Review + passende deterministische
+Checks**. Gitleaks prueft Secrets; OpenGrep/Semgrep oder vorhandene gleichwertige
+SAST-Pruefungen den Quellcode; Trivy relevante Dependencies, Container und IaC.
+Die konkrete Auswahl folgt dem Stack und belegter Abdeckung. Greptile, CodeRabbit
+und Qodo sind optionale Alternativen zum PR-Review, wenn Datenfreigabe, Kontingent
+und Mehrwert geklaert sind. Kein Gratis-Tarif und kein Qualitaetsvorsprung werden
+vorausgesetzt. ZAP/Schemathesis kommen bei passenden Web-/API-Projekten dazu.
 
 Die kurze [Anleitung zur Projektanbindung](docs/project-onboarding.md) beschreibt
 Einrichtung, Ersatzloesungen und Abnahme. Die Installation dieses Harness allein
-verbindet weder Greptile noch installiert sie Scanner. Der jeweilige Projekt-Codex
+verbindet keine Review-Dienste und installiert keine Scanner. Der jeweilige Projekt-Codex
 setzt diese Schritte fuer die konkrete Anwendung um und weist offene Punkte aus.
 
 Im Projekt dessen Anweisungen und Stack lesen, aktuelle Tests ausfuehren, kritische
@@ -148,10 +170,29 @@ Der erste Fehler stoppt die Suite; weitere Checks erscheinen als `not_run`. Time
 fehlendes Tool und leere Stufe gelten nie als Erfolg. Alte PASS-Berichte werden vor
 dem Lauf ungueltig gemacht. Logs laufen ins Terminal; der Bericht speichert Metadaten.
 
+Der Bericht enthaelt Start-/Abschlusszeit, Python-Version, Plattform, Runner- und
+Konfigurations-Hash sowie gestartete und nicht gestartete Checks. Bei ungueltiger
+Konfiguration ist `selection_complete: false`: eine leere `not_run`-Liste beweist
+dann keine vollstaendige Ausfuehrung. Timeout und Unterbrechung haben getrennte
+Fehlergruende. Toolversionen, Scanner-Regeln, Testanzahlen und originale Reports
+muessen die Projektbefehle liefern; der Runner kann ihre Semantik nicht erraten.
+Ein Tool mit Exitcode 0 trotz null Tests, uebersprungener Ziele oder Findings wird
+ohne passenden Projektadapter nicht automatisch erkannt.
+
 Release-Pruefungen verlangen einen sauberen Git-Stand und erkennen Aenderungen daran
 waehrend des Laufs. **Dieser Runner ist kein unabhaengiges Release-Gate.** Der Agent
 kann ihn und Projektbefehle veraendern. Die technische Release-Grenze, isolierte
 Ausfuehrung und Bindung an den Artefakt-Hash werden beim produktiven Projekt umgesetzt.
+
+Ein separat vorgegebener voller Commit kann zusaetzlich gebunden werden:
+
+```sh
+bash harness.sh verify --project /pfad/app --stage release --expected-commit <volle-commit-sha>
+```
+
+Ein abweichender Commit stoppt vor dem ersten Check. Den Soll-Commit aus dem
+Review-/CI-Auftrag beziehen; `git rev-parse HEAD` am selben ungeprueften Checkout
+liefert allein keine unabhaengige Sollvorgabe. Diese Option ist kein Release-Gate.
 
 ## Pruefung dieses Pakets
 
@@ -164,10 +205,28 @@ fuehren Installation, Wiederholung, Update und Rollback ueber echte Shell-Einsti
 Sie testen auch Drift, unveraenderte Nutzerregeln, Pfade mit Leerzeichen sowie
 absichtliche Fehler, fehlende Befehle und Timeouts. Keine Kundensoftware wird veraendert.
 
+Der Workflow `.github/workflows/ci.yml` prueft Linux/Windows mit Python 3.11/3.14,
+Ruff, Actionlint und Gitleaks samt synthetischem Fehlertest. Actions sind per Commit,
+Werkzeugdownloads per Version und SHA-256 gepinnt. Keine Runtime-Pakete erforderlich.
+Das lokale `harness.checks.json` startet in **allen drei Stufen nur die Python-Tests**;
+die CI-Scanner sind separate Jobs, keine Security-Garantie fuer angebundene Projekte.
+
+GitHub-Checks und Branch Protection werden durch eine lokale Workflow-Datei noch
+nicht aktiviert oder nachgewiesen. Nach Push alle vier `Tests (...)`-Checks und
+`Lint and secrets` pruefen und als Pflichtchecks konfigurieren. Vertraute Reviews
+fuer Workflow-/Policy-Aenderungen, geschuetzte Branches und eine separate
+Release-Identitaet sind Einstellungen des Zielrepositories. Fork-PRs laufen auf
+kurzlebigen GitHub-Runnern mit Leserechten, ohne Secrets oder Deployment.
+Bei privaten Repositories vorhandenes Actions-Kontingent/Budget beachten.
+
+Recherche, begruendete Nicht-Aenderungen und aktuelle Pruefgrenzen:
+[kritische Bewertung](docs/evaluation.md). Optional:
+[Web/API-Abnahme](templates/web-api-profile.md).
+
 ## Fuer die Debian-Codex-Aufgabe
 
 > Lies START-HERE.md aus https://github.com/ShigeoAMV/codex-harness auf Version
 > v0.1.6 und fuehre das Onboarding mit mir fuer meinen Webdienst durch.
 
 Referenzen: [Codex AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md),
-[Superpowers, gepinnter Stand](https://github.com/obra/superpowers/tree/5bf4e78011075bcfc0dc295f0724994cd123ee71).
+[Superpowers, aktueller Stand](https://github.com/obra/superpowers).

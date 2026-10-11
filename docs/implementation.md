@@ -7,7 +7,7 @@ The Debian application is handled in its own Codex session after this repository
 1. Implement a standard-library installer with managed AGENTS block, local backups,
    idempotence, explicit revision updates, status and reversible rollback.
 2. Add concise global rules and on-demand workflow reference; use upstream Superpowers,
-   pinned through the native Codex marketplace rather than vendoring a second framework.
+   maintained through native Codex plugin updates rather than vendoring a second framework.
 3. Add a fail-closed project check runner and templates, without guessing application commands.
 4. Test Windows and Linux, review, publish a private repository, install locally.
 
@@ -23,4 +23,6 @@ Progress: installer and runner implemented with regression tests. First tests fa
 before implementation; Windows and Linux shell integration passed. Fresh reviewer
 found three issues: interrupted transaction recovery, plugin identity validation,
 Windows timeout cleanup. Each reproduced as a failing regression test and fixed.
-Additional pin validation rejects mutable marketplace refs. No paid backend invoked.
+Historical pin validation has been removed at the user's request: Superpowers
+stays current through native updates, with no required version or commit.
+Official source and single-active-installation checks remain. No paid backend invoked.

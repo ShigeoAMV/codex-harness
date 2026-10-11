@@ -221,8 +221,7 @@ def bundle_from_checkout(ref=None):
 def plugin_status(home):
     """Report only relevant plugin metadata, never config values or credentials."""
     manifest = json.loads((ROOT / 'harness.json').read_text(encoding='utf-8'))
-    expected = manifest['superpowers']['version']
-    result = {'expected_superpowers': expected, 'issues': [], 'superpowers': []}
+    result = {'issues': [], 'superpowers': [], 'freshness': 'not_checked'}
     active = []
     try:
         env = dict(os.environ, CODEX_HOME=str(home))
@@ -233,10 +232,10 @@ def plugin_status(home):
         plugins = json.loads(run.stdout)['installed']
         active = [p for p in plugins if p['name'] == 'superpowers' and p.get('enabled')]
         result['superpowers'] = [{k: p.get(k) for k in ('pluginId', 'version')} for p in active]
-        if (len(active) != 1 or active[0].get('version') != expected
+        if (len(active) != 1
                 or active[0].get('pluginId') not in manifest['superpowers']['accepted_plugins']):
-            result['issues'].append('Expected exactly one enabled Superpowers ' + expected
-                                    + ' from an accepted source; reuse a matching existing installation')
+            result['issues'].append('Expected exactly one enabled Superpowers from an accepted source; '
+                                    'reuse the existing installation')
     except (OSError, subprocess.TimeoutExpired, ValueError, KeyError, HarnessError):
         result['issues'].append('Cannot verify Superpowers; check Codex plugin settings manually')
     config = read(home / 'config.toml')
@@ -249,10 +248,9 @@ def plugin_status(home):
     marketplace = parsed.get('marketplaces', {}).get('superpowers-dev', {})
     upstream = manifest['superpowers']['repository']
     uses_dev = any(p.get('pluginId') == manifest['superpowers']['plugin'] for p in active)
-    if uses_dev and (marketplace.get('ref') != manifest['superpowers']['commit']
-            or marketplace.get('source_type') != 'git'
+    if uses_dev and (marketplace.get('source_type') != 'git'
             or marketplace.get('source') not in (upstream, upstream + '.git')):
-        result['issues'].append('Superpowers marketplace source/ref differs from harness.json pin')
+        result['issues'].append('Superpowers marketplace must use the official Git source')
     return result
 
 
@@ -263,6 +261,7 @@ def main():
     parser.add_argument('--ref', help='Required for update: full checked-out Git commit SHA')
     parser.add_argument('--project', type=Path, default=Path.cwd())
     parser.add_argument('--stage', choices=['dev', 'security', 'release'], default='dev')
+    parser.add_argument('--expected-commit', help='For release verification: require this exact full commit SHA')
     args = parser.parse_args()
     try:
         home = args.codex_home.absolute()
@@ -283,7 +282,7 @@ def main():
             return 0 if report['aligned'] else 1
         else:
             from checks import verify
-            return verify(args.project, args.stage)
+            return verify(args.project, args.stage, expected_commit=args.expected_commit)
         return 0
     except (HarnessError, OSError, ValueError, KeyError, subprocess.TimeoutExpired) as exc:
         print('ERROR: ' + str(exc), file=sys.stderr)

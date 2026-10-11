@@ -8,10 +8,10 @@ documentation tree or run every scanner after every edit.
 
 | Purpose | Standard | Required decision at project onboarding |
 | --- | --- | --- |
-| Engineering | Superpowers | Reuse one existing supported installation; see README for accepted sources/version. Never add a second copy merely to change marketplace. |
-| Separate PR review | Greptile preferred; fresh Codex review as fallback | Configure Greptile for the selected repository when code transmission is allowed and a no-extra-cost plan is available; otherwise record the reason and fallback |
+| Engineering | Superpowers, kept current through native updates | Reuse one existing installation from an accepted source; check/apply updates at task start, with no version/commit requirement. Report unavailable updates; do not create a second copy. |
+| Separate PR review | Fresh Codex review; approved external reviewer as an alternative | Choose one primary reviewer; verify permission, quota/cost and incremental value before adding Greptile, CodeRabbit or Qodo |
 | Secrets | Gitleaks | Integrate changed-content checks and relevant Git history scanning before release |
-| Source security | OpenGrep | Pin engine and suitable rules for the project's supported languages |
+| Source security | OpenGrep, Semgrep or an existing equivalent | Choose one suitable engine/ruleset first; pin versions and prove coverage on the actual stack |
 | Dependencies / containers / IaC | Trivy | Enable applicable scanners and explicit blocking exit codes |
 | Runtime checks | ZAP / Schemathesis | Add for relevant web/API targets in isolated staging |
 | Agentic pentesting | Shannon / Strix | Later evaluation after the baseline works; not an onboarding dependency |
@@ -66,11 +66,11 @@ Self-hosted maintained software is a valid option when its operating duties are 
    findings in small changes, with a reproduction and regression test where possible.
 5. Connect actual project commands to harness.checks.json. No dummy successful checks.
    Missing tools or commands block a configured stage, not unrelated development.
-6. Integrate the applicable Gitleaks/OpenGrep/Trivy checks with pinned tool/rule versions.
+6. Integrate applicable secret/SAST/dependency checks with pinned tool/rule versions.
    Prove blocking behavior using synthetic secret/SAST/dependency fixtures in a temporary
    test area, not real secrets or vulnerable code left in the production branch.
-7. Configure Greptile for the selected repository or record why it cannot be used.
-   Define the fresh Codex-review fallback. Record each baseline item as configured,
+7. Define a fresh Codex review or reuse an approved external reviewer.
+   Record each baseline item as configured,
    missing, fallback, or not applicable with a reason in existing project documentation.
    A successful onboarding report must not imply missing items have been installed.
 
@@ -92,8 +92,8 @@ Documentation-only work needs appropriate lightweight verification, not a full b
 Security-sensitive changes: negative auth/input/failure tests and a separate review
 are required before merge/release. This includes auth, permissions, tenant isolation,
 uploads, URL fetching, secrets, payments/transactions, migrations and release controls.
-Prefer Greptile; use a fresh Codex context when data policy, quota or availability
-prevents it. Give the reviewer the diff, relevant context and acceptance criteria.
+Use a fresh Codex context or one approved external reviewer. Give the reviewer the
+diff, relevant context and acceptance criteria.
 Record reviewed commit, findings and disposition; review new relevant changes again.
 If neither review path is available, mark review pending rather than self-approving.
 Development can continue. Fresh Codex review shares model blind spots and is not an
@@ -103,7 +103,7 @@ Internal/homelab release: critical behavior, secrets and relevant dependency che
 Increase coverage when sensitive data, broad permissions or availability warrant it.
 
 Public/production release: build/type/lint, relevant unit/integration/E2E, negative
-authorization, pinned OpenGrep rules and engine, Gitleaks, Trivy, and runtime checks
+authorization, applicable pinned SAST/secret/dependency scanners, and runtime checks
 where applicable. Add Schemathesis for a suitable API schema, ZAP for a running web
 target, migration/restore tests for affected persistent data. Do not invent schema
 coverage or call a skipped authenticated scan complete. Record exclusions and why.
@@ -137,10 +137,20 @@ and a Markdown prohibition are not technical isolation.
 
 ## Review budget and optional tools
 
-Greptile is the preferred standard, not a mandatory service dependency. Reserve its
-free allowance for critical and substantial PRs; do not spend it automatically on
-every tiny change. Check actual account entitlements at setup; no paid upgrade or
-automatic overage. A separate review never replaces deterministic tests or scanners.
+Use normal Codex diff review for code quality and targeted security review for
+changed trust boundaries. An available Codex Security Standard scan can assess a
+repository or scoped component beyond the diff. Deep Scan is a repeated, broader
+effort for high-risk unresolved questions, not the default for every PR. Availability
+of a skill does not prove backend access, pricing or entitlement. Verify those first;
+record scope, reviewed revision, validation and actual consumption where available.
+Never auto-escalate to a paid scan. Neither AI review nor a scan is release authority.
+
+External PR reviewers are alternatives, not additive defaults. Compare confirmed
+new findings, false positives, review latency, quota/cost and maintenance on a small
+approved pilot. Vendor benchmarks are not independent evidence. A fresh Codex
+review also consumes quota and shares model blind spots. Re-review material fixes;
+do not run multiple general reviews of the same unchanged diff without a question.
+A separate review never replaces deterministic tests or scanners.
 Shannon/Strix: optional evaluation against explicitly authorized disposable staging,
 synthetic data, no production credentials or access. Never require subscription
 workarounds for the core workflow. Add tools only after a demonstrated coverage gap.

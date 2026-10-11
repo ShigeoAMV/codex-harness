@@ -171,10 +171,16 @@ class InstallTests(unittest.TestCase):
         dev = dict(curated, pluginId='superpowers@superpowers-dev')
         self.assertTrue(self.plugin_report([curated, dev])['issues'])
 
-    def test_wrong_curated_version_is_reported(self):
-        self.assertTrue(self.plugin_report([
-            {'name': 'superpowers', 'pluginId': 'superpowers@openai-curated-remote',
-             'version': '0.0.0', 'enabled': True}])['issues'])
+    def test_plugin_versions_are_inventory_not_a_requirement(self):
+        for version in ('6.4.1', '7.0.0', '99.0.0', None):
+            with self.subTest(version=version):
+                report = self.plugin_report([
+                    {'name': 'superpowers', 'pluginId': 'superpowers@openai-curated-remote',
+                     'version': version, 'enabled': True}])
+                self.assertEqual(report['issues'], [])
+                self.assertEqual(report['superpowers'][0]['version'], version)
+                self.assertNotIn('expected_superpowers', report)
+                self.assertEqual(report.get('freshness'), 'not_checked')
 
     def test_wrong_plugin_identity_is_not_aligned(self):
         from types import SimpleNamespace
@@ -184,16 +190,23 @@ class InstallTests(unittest.TestCase):
         with patch.object(h.subprocess, 'run', return_value=fake):
             self.assertTrue(h.plugin_status(self.home)['issues'])
 
-    def test_mutable_plugin_ref_is_not_aligned(self):
-        from types import SimpleNamespace
+    def test_official_marketplace_accepts_a_tracking_branch(self):
         (self.home / 'config.toml').write_text(
             '[marketplaces.superpowers-dev]\nsource_type="git"\n'
             'source="https://github.com/obra/superpowers.git"\nref="main"\n')
-        fake = SimpleNamespace(returncode=0, stdout=json.dumps({'installed': [
+        report = self.plugin_report([
             {'name': 'superpowers', 'pluginId': 'superpowers@superpowers-dev',
-             'version': '6.4.1', 'enabled': True}]}))
-        with patch.object(h.subprocess, 'run', return_value=fake):
-            self.assertTrue(h.plugin_status(self.home)['issues'])
+             'version': '99.0.0', 'enabled': True}])
+        self.assertEqual(report['issues'], [])
+
+    def test_wrong_marketplace_source_is_still_reported(self):
+        (self.home / 'config.toml').write_text(
+            '[marketplaces.superpowers-dev]\nsource_type="git"\n'
+            'source="https://github.com/untrusted/superpowers.git"\nref="main"\n')
+        report = self.plugin_report([
+            {'name': 'superpowers', 'pluginId': 'superpowers@superpowers-dev',
+             'version': '99.0.0', 'enabled': True}])
+        self.assertTrue(report['issues'])
 
 
 if __name__ == '__main__':
