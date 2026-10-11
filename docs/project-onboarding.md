@@ -93,7 +93,10 @@ priorisieren und mit den folgenden Test-/Scanner-Schritten verbinden:
   Keine privilegierten Backend-/Datenbank-Schluessel im Browser ausliefern. Getrennte
   Domains/Repositories, versteckte Buttons und CORS ersetzen keine Zugriffskontrolle.
 - **Gitleaks:** geaenderte Inhalte schnell pruefen; vor Release relevante Git-Historie.
-- **OpenGrep:** zur Sprache passende Regeln und Engine auf konkrete Versionen pinnen.
+- **SAST:** OpenGrep, Semgrep oder vorhandene gleichwertige Checks passend zum Stack
+  waehlen. Engine und Regeln auf konkrete Versionen pinnen; nicht zwei weitgehend
+  gleiche Regelsaetze ohne gemessenen Zusatznutzen betreiben. CodeQL nur bei
+  passender Sprachabdeckung und geklaerter Lizenz/Verfuegbarkeit.
 - **Trivy:** Dependencies sowie vorhandene Container/IaC pruefen. Blockierende
   Schweregrade und Fehler-Exitcodes explizit konfigurieren; ein Report allein blockiert nicht.
 - Werkzeuge aus offiziellen Quellen beziehen, Versionen und Regeln dokumentieren.
@@ -102,29 +105,47 @@ priorisieren und mit den folgenden Test-/Scanner-Schritten verbinden:
   passenden `stages` zuordnen; die Stufen erben keine Checks voneinander.
 - Mit synthetischen Fehlern in temporaeren Fixtures nachweisen, dass relevante
   Checks fehlschlagen. Keine echten Secrets und keine Testluecken im Produkt hinterlassen.
+- Fuer jeden Pflichtcheck festhalten: exakter Befehl, Tool-/Regelversion, Zielumfang,
+  tatsaechlich ausgefuehrte Tests/Dateien/Endpoints, Exitcode und frischer Report.
+  Dependency-Scans brauchen zudem Advisory-Datenbankstand und erkannte Manifeste.
+  Ein fehlendes Tool, null ausgefuehrte Tests, ignorierte Pflichtziele oder ein alter
+  Report erfuellen die Abnahme nicht. Wo das Tool trotzdem 0 liefert, muss ein
+  kleiner projektspezifischer Adapter diese Bedingungen pruefen und ungleich 0 liefern.
+  Danach sowohl einen gueltigen Lauf als auch einen absichtlich fehlerhaften Lauf
+  ueber `harness verify` pruefen. Den synthetischen Fund im Report kontrollieren;
+  irgendein Fehlercode kann auch ein Toolabsturz sein.
+- Abdeckung vor Toolanzahl: Trivy-Secret-Scanning und Gitleaks bzw. zwei SAST-Engines
+  koennen sich stark ueberschneiden. Nur belegte Luecken rechtfertigen Doppelbetrieb.
+  Fuer stdlib-only Python ohne Container/Dependencies sind fehlende solche Ziele
+  ein dokumentiertes Nicht-anwendbar, kein erfolgreicher Dependency-Scan.
 
-## 3. Greptile als bevorzugten Reviewer einrichten
+## 3. Einen separaten Reviewer waehlen
 
-1. Klaeren, ob Code dieses Repositories an Greptile uebermittelt werden darf. Eine
-   private GitHub-Sichtbarkeit allein ist keine Datenfreigabe. Bei Unklarheit lokal bleiben.
-2. Den aktuell verfuegbaren kostenlosen Tarif und dessen Kontingent im Konto pruefen.
-   Keine kostenpflichtige Buchung oder automatische Ueberschreitung aktivieren.
-3. Die offizielle Greptile-GitHub-Integration fuer **dieses ausgewaehlte Repository**
-   verbinden. Erforderliche Account-/Organisationsfreigaben erledigt der berechtigte
-   Nutzer; Codex dokumentiert einen solchen offenen Schritt, statt ihn als erledigt zu melden.
-4. An einem kleinen PR einen Review ausloesen und pruefen, dass Findings zum richtigen
-   Commit eintreffen. Review-Regeln auf wichtige Projektinvarianten ausrichten.
-5. Kontingent bevorzugt fuer kritische und umfangreiche PRs verwenden. Die konkrete
-   Ausloesung nach den verfuegbaren Integrationseinstellungen waehlen; keine ungetestete
-   automatische Risikoerkennung voraussetzen.
+Standard: **frischer Codex-Review** mit Diff, Anforderungen und relevantem
+Codekontext. Bestehende zugelassene externe Reviews koennen diese Aufgabe uebernehmen.
+Greptile, CodeRabbit oder Qodo nicht zusaetzlich automatisch auf denselben Diff
+ansetzen. Ein anderer Anbieter kann andere Fehler finden; das ist zu messen,
+nicht aus Produktwerbung abzuleiten. Auch Codex verbraucht Kontingent.
 
-Wenn Datenfreigabe, Kontingent oder Verfuegbarkeit fehlen: **separater frischer
-Codex-Review** mit Diff, Anforderungen und relevantem Codekontext. Gruende fuer den
-Ersatz festhalten. Beide Reviewer koennen Fehler uebersehen; Testergebnisse bleiben
-verbindlich. Greptile ist Standard, keine unersetzliche Freigabeinstanz.
+Vor einem externen Pilot: Codefreigabe fuer genau dieses Repository, Datenhaltung,
+App-Berechtigungen, aktuellen Tarif und Limits klaeren. Private GitHub-Sichtbarkeit
+ist keine Datenfreigabe; ein Gratis-Tarif wird nicht vorausgesetzt. Keine Buchung
+oder automatische Ueberschreitung ohne Zustimmung. Danach an einem kleinen
+freigegebenen PR richtigen Commit, neue valide Findings, Fehlalarme und Aufwand
+pruefen. Menschliche Integrationsschritte bleiben sichtbar offen.
 
-Anbieterquellen fuer die Einrichtung: [Greptile-Dokumentation](https://www.greptile.com/docs/introduction),
-[Tarife](https://www.greptile.com/pricing), [Datenverarbeitung](https://www.greptile.com/security).
+| Frage / Anlass | Passende Pruefung |
+| --- | --- |
+| Lokaler Diff, normale Korrektheit | Normaler Codex-Review; Umfang nach Risiko |
+| Kritischer Diff | Separater Review mit negativen Tests und gezieltem Security-Fokus |
+| Repo-/Komponentenbestand unbekannt | Codex Security Standard Scan, falls verfuegbar und im genehmigten Budget |
+| Hohes Risiko und verbleibende konkrete Unsicherheit | Deep Scan gezielt evaluieren; mehrere Durchlaeufe kosten zusaetzlich |
+| Bereits validierter Befund | Kleine Reparatur und gezielte Verifikation statt erneutem Vollscan |
+
+Skill-Verfuegbarkeit, Backend-Zugang und Abrechnung sind getrennte Voraussetzungen.
+Aktuelle Konditionen im Konto pruefen; keine pauschale Aussage, Codex Security sei
+kostenlos oder Bestandteil jedes Codex-Zugangs. Die [Bewertung](evaluation.md)
+kennzeichnet den hier tatsaechlich verifizierten Quellenstand.
 
 ## 4. Pruefaufwand passend einsetzen
 
@@ -141,7 +162,9 @@ bleibt offen; er wird nicht durch eine Selbsteinschaetzung ersetzt. Entwicklung 
 weitergehen. Nicht nach jeder kleinen Aenderung alle Scans wiederholen.
 
 ZAP fuer geeignete Webziele und Schemathesis fuer passende API-Schemas in isoliertem
-Staging ergaenzen. Shannon/Strix erst nach funktionierender Basis evaluieren.
+Staging ergaenzen. Das optionale [Web/API-Profil](../templates/web-api-profile.md)
+enthaelt Abnahmekriterien fuer authentifizierte Abdeckung und ASVS 5.0.
+Shannon/Strix erst nach funktionierender Basis evaluieren.
 
 ## 5. Kurze Abnahme statt Papierberg
 
@@ -149,7 +172,7 @@ Eine Tabelle in bestehender Projektdokumentation genuegt:
 
 | Baustein | Status | Nachweis / Grund / naechster Schritt |
 | --- | --- | --- |
-| Tests, Gitleaks, OpenGrep, Trivy, Review (je eine Zeile) | eingerichtet / fehlt / Ersatz / nicht anwendbar | Befehl und letzter Lauf bzw. konkrete Begruendung |
+| Tests, Secrets, SAST, Dependencies, Review (je eine Zeile) | eingerichtet / fehlt / Ersatz / nicht anwendbar | Befehl, Commit, Versionen, ausgefuehrte Ziele, frischer Report und negativer Abnahmetest bzw. konkrete Begruendung |
 
 Offene anwendbare Pflichtchecks blockieren die betroffene Freigabe, nicht den gesamten
 Entwicklungsalltag. Ausnahmen brauchen menschliche Entscheidung mit Umfang und Ablaufdatum.

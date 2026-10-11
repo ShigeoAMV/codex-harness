@@ -25,8 +25,9 @@ braucht die Instanz GitHub-Zugriff oder einen lokalen Clone des Harness.
 
 3. **Passenden Umfang vorschlagen.** Zeige kurz: jetzt noetig, spaeter sinnvoll oder
    nicht anwendbar, jeweils mit Begruendung. Beruecksichtige Projekt-/Security-Vertrag,
-   kritische Tests, Greptile mit frischem Codex-Review als Ersatz, Gitleaks, OpenGrep,
-   Trivy sowie passende CI-/Laufzeit-/Recovery- und Release-Pruefungen. Zusaetzliche
+   kritische Tests, einen separaten frischen Codex-Review und passende Secret-/SAST-/
+   Dependency-Checks sowie CI-/Laufzeit-/Recovery- und Release-Pruefungen. Externe
+   Reviewer nur bei erlaubter Codeuebermittlung und geklaertem Mehrwert/Kontingent. Zusaetzliche
    Skills und Shannon/Strix nur bei konkretem Nutzen. Keine Zusatzabos. Waehle wenige
    priorisierte Schritte mit sichtbaren Abnahmekriterien und unterscheide schnelle
    Entwicklungschecks von umfassenderen Release-Pruefungen.

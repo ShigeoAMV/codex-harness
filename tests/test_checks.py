@@ -2,6 +2,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import hashlib
 import sys
 import subprocess
 import tempfile
@@ -40,6 +41,35 @@ class CheckTests(unittest.TestCase):
         self.assertEqual(self.run_check(), 0)
         self.assertEqual(self.report()['status'], 'PASS')
 
+    def test_evidence_identifies_runtime_runner_and_completion(self):
+        self.configure(['{python}', '-c', 'pass'])
+        self.assertEqual(self.run_check(), 0)
+        report = self.report()
+        self.assertTrue(report.get('selection_complete'))
+        self.assertGreaterEqual(report.get('finished_at', ''), report['started_at'])
+        self.assertEqual(report.get('runtime', {}).get('python'), sys.version.split()[0])
+        self.assertEqual(report.get('runner_sha256'),
+                         hashlib.sha256((ROOT / 'checks.py').read_bytes()).hexdigest())
+        self.assertEqual(report.get('not_run'), [])
+
+    def test_boolean_schema_is_rejected(self):
+        self.configure(['{python}', '-c', 'pass'])
+        config = json.loads(self.config.read_text())
+        config['schema'] = True
+        self.config.write_text(json.dumps(config))
+        self.assertEqual(self.run_check(), 2)
+        self.assertEqual(self.report()['checks'], [])
+
+    def test_failure_records_remaining_checks_without_running_them(self):
+        self.configure(['{python}', '-c', 'raise SystemExit(7)'])
+        config = json.loads(self.config.read_text())
+        config['checks'].append(dict(config['checks'][0], name='later', argv=[
+            '{python}', '-c', 'from pathlib import Path; Path("unexpected").touch()']))
+        self.config.write_text(json.dumps(config))
+        self.assertEqual(self.run_check(), 1)
+        self.assertEqual(self.report()['not_run'], ['later'])
+        self.assertFalse((self.root / 'unexpected').exists())
+
     def test_failure_blocks(self):
         self.configure([sys.executable, '-c', 'raise SystemExit(7)'])
         self.assertEqual(self.run_check(), 1)
@@ -55,6 +85,7 @@ class CheckTests(unittest.TestCase):
         self.configure([sys.executable, '-c', 'import time; time.sleep(20)'], timeout_seconds=1)
         self.assertNotEqual(self.run_check(), 0)
         self.assertEqual(self.report()['status'], 'ERROR')
+        self.assertEqual(self.report()['checks'][0].get('reason'), 'timeout')
 
     def test_missing_stage_cannot_pass(self):
         self.configure([sys.executable, '-c', 'pass'])
@@ -123,6 +154,34 @@ class CheckTests(unittest.TestCase):
         (self.root / 'untracked.txt').write_text('dirty')
         self.assertNotEqual(self.run_check('release'), 0)
         self.assertEqual(self.report()['checks'], [])
+        self.assertEqual(self.report().get('not_run'), ['unit'])
+
+    def test_release_requires_the_requested_commit_before_running_checks(self):
+        self.prepare_release('from pathlib import Path; Path("unexpected").touch()')
+        self.assertEqual(c.verify(self.root, 'release', expected_commit='f' * 40), 2)
+        self.assertEqual(self.report()['checks'], [])
+        self.assertEqual(self.report()['not_run'], ['unit'])
+        self.assertIn('Expected commit', self.report()['error'])
+        self.assertFalse((self.root / 'unexpected').exists())
+
+    def test_release_accepts_the_requested_full_commit(self):
+        self.prepare_release()
+        commit = self.git_head()
+        self.assertEqual(c.verify(self.root, 'release', expected_commit=commit), 0)
+        self.assertEqual(self.report()['expected_commit'], commit)
+        self.assertEqual(self.report()['git']['commit'], commit)
+
+    def git_head(self):
+        return subprocess.check_output(['git', '-C', str(self.root), 'rev-parse', 'HEAD'],
+                                       text=True).strip()
+
+    def test_expected_commit_rejects_short_or_symbolic_refs_and_wrong_stage(self):
+        self.prepare_release()
+        for ref in ('main', self.git_head()[:12], ''):
+            with self.subTest(ref=ref):
+                self.assertEqual(c.verify(self.root, 'release', expected_commit=ref), 2)
+                self.assertEqual(self.report()['checks'], [])
+        self.assertEqual(c.verify(self.root, 'dev', expected_commit=self.git_head()), 2)
 
     def test_release_detects_mutation_by_check(self):
         self.prepare_release('from pathlib import Path; Path("changed.txt").write_text("changed")')

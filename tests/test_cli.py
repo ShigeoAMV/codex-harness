@@ -17,7 +17,7 @@ class CliTests(unittest.TestCase):
         self.repo = Path(self.tmp.name) / 'source'
         self.repo.mkdir()
         self.home = Path(self.tmp.name) / 'codex home'
-        for filename in ('harness.py', 'harness.ps1', 'harness.sh', 'harness.json'):
+        for filename in ('harness.py', 'checks.py', 'harness.ps1', 'harness.sh', 'harness.json'):
             shutil.copy2(ROOT / filename, self.repo / filename)
         shutil.copytree(ROOT / 'payload', self.repo / 'payload')
         self.git('init', '-q')
@@ -78,6 +78,26 @@ class CliTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
         self.assertIn('clean checkout', result.stderr)
         self.assertFalse((self.home / 'AGENTS.md').exists())
+
+    def test_shell_verify_binds_the_expected_commit(self):
+        (self.repo / '.gitignore').write_text('.harness-evidence/\n__pycache__/\n')
+        (self.repo / 'harness.checks.json').write_text(json.dumps({
+            'schema': 1, 'profile': 'internal', 'checks': [{
+                'name': 'smoke', 'stages': ['release'],
+                'argv': ['{python}', '-c', 'assert 2 + 2 == 4'], 'timeout_seconds': 5}]}))
+        self.git('add', '.')
+        self.git('-c', 'user.name=Test', '-c', 'user.email=test@example.invalid',
+                 'commit', '-qm', 'checks')
+        commit = self.git('rev-parse', 'HEAD').strip()
+        result = self.cli('verify', '--project', str(self.repo), '--stage', 'release',
+                          '--expected-commit', commit, wrapper=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        wrong = self.cli('verify', '--project', str(self.repo), '--stage', 'release',
+                         '--expected-commit', 'f' * 40, wrapper=True)
+        self.assertEqual(wrong.returncode, 2, wrong.stdout + wrong.stderr)
+        report = json.loads((self.repo / '.harness-evidence/result.json').read_text())
+        self.assertEqual(report['not_run'], ['smoke'])
+        self.assertEqual(report['checks'], [])
 
 
 if __name__ == '__main__':

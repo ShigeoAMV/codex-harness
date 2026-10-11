@@ -16,6 +16,11 @@ Add a compact resource/action/actor authorization table when applicable.
 ## Verification
 Actual fast checks, security checks and release checks. Record current baseline
 failures separately. Map checks to important invariants, not only file coverage.
+For each required check record its scope, tool/rule/database versions, executed
+test/target counts, fresh report and a synthetic failing acceptance case. Record
+unreached targets and skips explicitly. Choose one primary separate reviewer;
+verify data permission and budget before using an external provider. For relevant
+web/API targets, adapt `web-api-profile.md` and prove authenticated coverage.
 
 ## Release and recovery
 Artifact identity, human release owner, deployment/rollback method and restore
