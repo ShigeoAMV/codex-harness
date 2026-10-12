@@ -14,6 +14,13 @@ Negative authorization/input cases, partial failures and retry behavior.
 Add a compact resource/action/actor authorization table when applicable.
 
 ## Verification
+For each critical flow, record the source of expected behavior (requirement, API
+contract or agreed acceptance criterion), the relevant unit/integration/end-to-end
+coverage, and the observable outcome. Choose the lowest layer that catches the
+relevant failure; not every flow needs all three. Identify real test dependencies,
+substituted services and untested boundaries; mocks alone do not prove integration.
+Use isolated test environments or authorized sandboxes.
+
 Actual fast checks, security checks and release checks. Record current baseline
 failures separately. Map checks to important invariants, not only file coverage.
 For each required check record its scope, tool/rule/database versions, executed

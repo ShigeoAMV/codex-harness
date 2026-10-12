@@ -86,6 +86,17 @@ review are satisfied, with exceptions visible; a clean scan alone is not a full 
 
 ## Risk and verification
 
+For each critical flow, choose test coverage at the lowest layer that reliably
+catches the relevant failure: unit tests for isolated logic, integration tests for
+component boundaries, and a small set of end-to-end tests from the real user entry
+point to the observable outcome. A CLI entry point is valid; a browser is not always
+needed. Verify meaningful outcomes, such as persisted order state, not just a success
+screen. Derive expected results from requirements, API contracts or agreed acceptance
+criteria, not from the implementation under test. Mocks alone do not establish that
+the replaced system integrates correctly. Use isolated test dependencies or authorized
+sandboxes and record substituted services and untested boundaries. Do not impose
+fixed test ratios or require all three layers for every function.
+
 Dev: relevant build/type/lint/tests plus a quick secret check for changed content.
 Documentation-only work needs appropriate lightweight verification, not a full build.
 
