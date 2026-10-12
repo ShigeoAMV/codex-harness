@@ -82,6 +82,26 @@ priorisieren und mit den folgenden Test-/Scanner-Schritten verbinden:
 
 ## 2. Tests und Scanner anbinden
 
+Fuer jeden kritischen Ablauf die passende Testabdeckung festlegen und in der
+vorhandenen Projektdokumentation festhalten:
+
+- **Unit:** Geschaeftslogik und Grenzfaelle isoliert und schnell pruefen.
+- **Integration:** das Zusammenspiel relevanter Komponenten an echten Testgrenzen
+  pruefen, etwa API und Testdatenbank oder einen Service gegen den API-Vertrag.
+  Mocks allein belegen keine funktionierende Integration mit dem ersetzten System.
+- **End-to-End:** wenige wichtige Nutzerablaeufe ueber den tatsaechlichen Einstieg
+  bis zum beobachtbaren Ergebnis pruefen, etwa Bestellung mit korrekt gespeichertem
+  Auftrag statt nur einer sichtbaren Bestaetigungsseite. Bei einem CLI kann der
+  Einstieg der Shell-Befehl sein; ein Browser ist nicht immer erforderlich.
+
+Erwartete Ergebnisse aus Anforderungen, API-Vertraegen oder abgestimmten
+Abnahmekriterien ableiten, nicht aus der Implementierung abschreiben. Die kleinste
+Testebene waehlen, die den jeweiligen Fehler verlaesslich erkennt; keine festen
+Testquoten oder alle drei Ebenen fuer jede Funktion verlangen. Reale Abhaengigkeiten
+nur in isolierten Testumgebungen bzw. freigegebenen Sandboxes verwenden. Ersetzte
+Dienste, nicht erreichte Grenzen und verbleibende Abdeckungsluecken benennen.
+
+
 - Die wichtigsten bisher ungeschuetzten Ablaeufe und negativen Berechtigungsfaelle
   testen. Bekannte Fehler nicht als erwartetes Verhalten festschreiben.
 - **Frontend als manipulierbar behandeln:** Berechtigungen, Eingaben und
